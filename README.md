@@ -8,4 +8,4 @@ To check for dependency updates:
 
 Generate protoc classes
 
-    protoc --proto_path=res --java_out=src res/anki_vector/messaging/*.proto res/google/api/*.proto
+    protoc --proto_path=res --java_out=src  res/anki_vector/messaging/*.proto res/google/api/*.proto
