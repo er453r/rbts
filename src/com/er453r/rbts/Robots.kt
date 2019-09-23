@@ -1,5 +1,6 @@
 package com.er453r.rbts
 
+import Anki.Vector.external_interface.Behavior
 import Anki.Vector.external_interface.ExternalInterfaceGrpc
 import Anki.Vector.external_interface.Messages
 import io.grpc.CallCredentials
@@ -10,7 +11,7 @@ import mu.KotlinLogging
 import java.io.File
 import java.util.concurrent.Executor
 
-class Robots(cert: String, token:String) {
+class Robots(cert: String, token: String) {
     private val log = KotlinLogging.logger {}
 
     init {
@@ -26,7 +27,7 @@ class Robots(cert: String, token:String) {
             )
             .build()
 
-        val callCredentials = object : CallCredentials(){
+        val callCredentials = object : CallCredentials() {
             override fun applyRequestMetadata(p0: RequestInfo?, p1: Executor?, p2: MetadataApplier?) {
                 val metadata = Metadata()
 
@@ -40,6 +41,22 @@ class Robots(cert: String, token:String) {
 
         val vectorInterface = ExternalInterfaceGrpc.newBlockingStub(channel).withCallCredentials(callCredentials)
 
+//        vectorInterface.driveOffCharger(Messages.DriveOffChargerRequest.newBuilder().build())
+
+        val resp = vectorInterface.assumeBehaviorControl(
+            Behavior.BehaviorControlRequest.newBuilder()
+                .setControlRequest(
+                    Behavior.ControlRequest.newBuilder()
+                        .setPriorityValue(Behavior.ControlRequest.Priority.OVERRIDE_BEHAVIORS_VALUE)
+                        .build()
+                )
+                .build()
+        )
+
+        log.info { "Response $resp" }
+
+        Thread.sleep(5000)
+
         val response = vectorInterface.setEyeColor(
             Messages.SetEyeColorRequest.newBuilder()
                 .setHue(0.83f)
@@ -48,6 +65,13 @@ class Robots(cert: String, token:String) {
         )
 
         log.info { "Response $response" }
+
+        val response2 = vectorInterface.batteryState(
+            Messages.BatteryStateRequest.newBuilder()
+                .build()
+        )
+
+        log.info { "Response $response2" }
 
         Thread.sleep(5000)
 
